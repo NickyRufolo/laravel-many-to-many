@@ -5,7 +5,7 @@
         <h1>Crea un nuovo post</h1>
     </div>
 
-    <form class="w-75 m-auto" action="{{route('admin.posts.store')}}" method="POST">
+    <form class="w-75 m-auto" action="{{ route('admin.posts.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div>
@@ -13,7 +13,7 @@
             <input class="form-control" type="text" name="title">
             @error('title')
                 <div class="alert alert-danger">
-                     {{$message}}
+                    {{ $message }}
                 </div>
             @enderror
         </div>
@@ -23,9 +23,9 @@
             <textarea class="form-control" name="body"></textarea>
             @error('body')
                 <div class="alert alert-danger">
-                    {{$message}}
+                    {{ $message }}
                 </div>
-             @enderror
+            @enderror
         </div>
 
         {{-- Category --}}
@@ -40,15 +40,19 @@
                 @endforeach
             </select>
         </div>
-
+        {{-- aggiunta file immagini --}}
+        <div class="my-3">
+            <label for="">Aggiunta cover image</label>
+            <input type="file" name="image" class="form-control-file">
+        </div>
         {{-- TAG --}}
         <div class="my-3">
             <label for="">Tags:</label>
             @foreach ($tags as $tag)
-            <label class="form-control"  for="">
-                <input type="checkbox" name="tags[]" value="{{ $tag->id }}">
-                {{ $tag->name}}
-            </label>
+                <label class="form-control" for="">
+                    <input type="checkbox" name="tags[]" value="{{ $tag->id }}">
+                    {{ $tag->name }}
+                </label>
             @endforeach
         </div>
 

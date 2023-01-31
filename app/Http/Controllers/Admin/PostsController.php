@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Message;
+use Illuminate\Support\Facades\Storage;
+
 
 class PostsController extends Controller
 {
@@ -20,7 +22,7 @@ class PostsController extends Controller
     {
         //con la funzione with() recupero anche le informazioni contenuti nella tabella category richiamando la funzione del model
         $data = [
-            'posts' => Post::with('category')->paginate(25) 
+            'posts' => Post::with('category')->paginate(25)
         ];
 
         return view('admin.posts.index', $data);
@@ -33,7 +35,7 @@ class PostsController extends Controller
      */
     public function create()
     {
-        
+
         $data = [
             'categories' => Category::All(),
             'tags' => Tag::All()
@@ -58,14 +60,18 @@ class PostsController extends Controller
             'title' => 'required',
             'body' => 'required'
         ]);
-
+        //Condizione if per controllare se l'immagine è stata caricata nell'input
+        if (array_key_exists('image', $data)) {
+            $cover_url = Storage::put('post_covers', $data['image']);
+            $data['cover'] = $cover_url;
+        }
         $newPost = new Post();
         $newPost->fill($data);
         $newPost->save();
 
         //Controllo se esiste all'interno di data un array di nome tags (controllo se l'utente ha cliccato delle checkbox)
-        if( array_key_exists( 'tags', $data ) ){
-            $newPost->tags()->sync( $data['tags'] );
+        if (array_key_exists('tags', $data)) {
+            $newPost->tags()->sync($data['tags']);
         }
 
         return redirect()->route('admin.posts.index');
@@ -116,9 +122,9 @@ class PostsController extends Controller
         $singolo_post->update($data);
 
         //Controlla se l'utente ha cliccato o erano già selezionate delle checkbox
-        if( array_key_exists( 'tags', $data ) ){
+        if (array_key_exists('tags', $data)) {
             $singolo_post->tags()->sync($data['tags']);
-        }else{
+        } else {
             //Non ci sono checkbox selezionate
             $singolo_post->tags()->sync([]);
         }
